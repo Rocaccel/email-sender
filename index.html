@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%232ecc71'/><path d='M50 15 L25 55 L45 55 L35 85 L75 45 L55 45 Z' fill='white'/></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%232ecc71'/><path d='M50 15 L25 55 L45 55 L35 85 L75 45 L55 45 Z' fill='white'/></svg>">
+    <title>Отправка показаний</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative; /* Чтобы спозиционировать шестеренку в углу */
+        }
+        h2 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 20px;
+            padding-right: 40px; /* Чтобы заголовок не налезал на шестеренку */
+            padding-left: 40px;
+        }
+        .alert-box {
+            background-color: #ffeaa7;
+            border: 2px dashed #ffb142;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #d35400;
+            line-height: 1.4;
+        }
+        label {
+            display: block;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #555;
+            text-align: left;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            font-size: 18px;
+            margin-bottom: 20px;
+            border: 2px solid #bdc3c7;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+        .huge-input {
+            font-size: 32px;
+            text-align: center;
+            padding: 15px;
+        }
+        input:focus, textarea:focus {
+            border-color: #2ecc71;
+            outline: none;
+        }
+        button {
+            width: 100%;
+            background-color: #2ecc71;
+            color: white;
+            padding: 20px;
+            font-size: 22px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(46, 204, 113, 0.3);
+            margin-bottom: 10px;
+        }
+        button:active {
+            background-color: #27ae60;
+            transform: scale(0.98);
+        }
+        /* Стиль для кнопки-шестеренки в верхнем правом углу */
+        .btn-settings {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            background: none;
+            border: none;
+            font-size: 28px; /* Достаточно крупная для нажатия, но аккуратная */
+            cursor: pointer;
+            color: #7f8c8d;
+            padding: 5px;
+            width: auto;
+            box-shadow: none;
+            margin-bottom: 0;
+            line-height: 1;
+        }
+        .btn-settings:active {
+            color: #34495e;
+            transform: scale(0.9);
+            background: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <button id="gearButton" onclick="showSettings()" class="btn-settings" title="Настройки" style="display: none;">⚙️</button>
+
+    <div id="settingsScreen" style="display: none;">
+        <h2>⚙️ Первичная настройка</h2>
+        <p style="color: #666; margin-bottom: 20px;">Заполните эти данные один раз. Они сохранятся только на этом телефоне.</p>
+        
+        <label for="cfgEmail">Email получателя:</label>
+        <input type="email" id="cfgEmail" placeholder="vasha_kompaniya@mail.ru">
+
+        <label for="cfgSubject">Тема письма:</label>
+        <input type="text" id="cfgSubject" placeholder="Показания электросчетчика">
+
+        <label for="cfgTemplate">Шаблон текста письма:<br><small style="font-weight:normal; color:#7f8c8d;">(Вместо [РАСХОД], [ТЕКУЩИЕ] и [ПРЕДЫДУЩИЕ] подставятся числа)</small></label>
+        <textarea id="cfgTemplate" rows="6" placeholder="Здравствуйте! Передаю показания за месяц.&#10;Текущие: [ТЕКУЩИЕ]&#10;Предыдущие: [ПРЕДЫДУЩИЕ]&#10;Расход: [РАСХОД] кВт.&#10;Лицевой счет: 123456789"></textarea>
+
+        <button onclick="saveSettings()">СОХРАНИТЬ НАСТРОЙКИ</button>
+    </div>
+
+    <div id="mainScreen" style="display: none;">
+        <h2>Показания счетчика</h2>
+        
+        <div class="alert-box">
+            ⚠️ ПОСЛЕ нажатия на кнопку СНИЗУ, не забудьте в почте нажать на СКРЕПКУ (📎) и прикрепить фото, если необходимо!
+        </div>
+        
+        <label for="current">ТЕКУЩИЕ показания:</label>
+        <input type="number" id="current" class="huge-input" pattern="[0-9]*" inputmode="numeric" placeholder="00000">
+
+        <label for="previous">ПРЕДЫДУЩИЕ показания:</label>
+        <input type="number" id="previous" class="huge-input" pattern="[0-9]*" inputmode="numeric" placeholder="00000">
+
+        <button onclick="sendEmail()">ДАЛЕЕ (ОТПРАВИТЬ)</button>
+    </div>
+</div>
+
+<script>
+window.onload = function() {
+    if (localStorage.getItem('emailTo')) {
+        showMain();
+    } else {
+        showSettings();
+    }
+};
+
+function showSettings() {
+    document.getElementById('mainScreen').style.display = 'none';
+    document.getElementById('gearButton').style.display = 'none'; // Скрываем шестеренку, когда мы уже в настройках
+    document.getElementById('settingsScreen').style.display = 'block';
+    
+    document.getElementById('cfgEmail').value = localStorage.getItem('emailTo') || '';
+    document.getElementById('cfgSubject').value = localStorage.getItem('emailSubject') || 'Показания электросчетчика';
+    document.getElementById('cfgTemplate').value = localStorage.getItem('emailTemplate') || 
+        "Здравствуйте!\n\nПередаю показания счетчика электроэнергии:\n- Текущие показания: [ТЕКУЩИЕ]\n- Предыдущие показания: [ПРЕДЫДУЩИЕ]\n- Расход за месяц: [РАСХОД] кВт.\n\nЛицевой счет №XXXXXXXXX.\nС уважением.";
+}
+
+function showMain() {
+    document.getElementById('settingsScreen').style.display = 'none';
+    document.getElementById('mainScreen').style.display = 'block';
+    document.getElementById('gearButton').style.display = 'block'; // Показываем шестеренку на главном экране
+    document.getElementById('current').value = '';
+    document.getElementById('previous').value = '';
+}
+
+function saveSettings() {
+    const email = document.getElementById('cfgEmail').value.trim();
+    const subject = document.getElementById('cfgSubject').value.trim();
+    const template = document.getElementById('cfgTemplate').value;
+
+    if (!email || !subject || !template) {
+        alert("Пожалуйста, заполните все поля настроек!");
+        return;
+    }
+
+    localStorage.setItem('emailTo', email);
+    localStorage.setItem('emailSubject', subject);
+    localStorage.setItem('emailTemplate', template);
+
+    showMain();
+}
+
+function sendEmail() {
+    const emailTo = localStorage.getItem('emailTo');
+    const emailSubject = localStorage.getItem('emailSubject');
+    let template = localStorage.getItem('emailTemplate');
+
+    const current = parseFloat(document.getElementById('current').value);
+    const previous = parseFloat(document.getElementById('previous').value);
+
+    if (isNaN(current) || isNaN(previous)) {
+        alert("Пожалуйста, введите оба числа!");
+        return;
+    }
+
+    const diff = current - previous;
+
+    if (diff < 0) {
+        alert("Ошибка: Текущие показания не могут быть меньше предыдущих!");
+        return;
+    }
+
+    template = template.replace('[ТЕКУЩИЕ]', current);
+    template = template.replace('[ПРЕДЫДУЩИЕ]', previous);
+    template = template.replace('[РАСХОД]', diff);
+
+    const fullBody = `⚠️ НАПОМИНАНИЕ: Пожалуйста, прикрепите сюда фото счетчика через значок скрепки (📎) перед отправкой!\n----------------------------------------\n\n` + template;
+
+    const subjectEncoded = encodeURIComponent(emailSubject);
+    const bodyEncoded = encodeURIComponent(fullBody);
+
+    window.location.href = `mailto:${emailTo}?subject=${subjectEncoded}&body=${bodyEncoded}`;
+}
+</script>
+
+</body>
+</html>
