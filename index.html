@@ -214,7 +214,7 @@ function sendEmail() {
     template = template.replace('[ПРЕДЫДУЩИЕ]', previous);
     template = template.replace('[РАСХОД]', diff);
 
-    const fullBody = `⚠️ НАПОМИНАНИЕ: Пожалуйста, прикрепите сюда фото счетчика через значок скрепки (📎) перед отправкой!\n----------------------------------------\n\n` + template;
+    const fullBody = template;
 
     const subjectEncoded = encodeURIComponent(emailSubject);
     const bodyEncoded = encodeURIComponent(fullBody);
