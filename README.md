@@ -94,11 +94,3 @@ https://your-domain.com/index.html
 
 Если у вас есть идеи по улучшению или вы нашли ошибку — создайте [Issue](https://github.com/Rocaccel/email-sender/issues).
 
-## 📄 Лицензия
-
-MIT License — используйте свободно!
-
----
-
-**Версия:** 1.0  
-**Последнее обновление:** 2026-06-18
